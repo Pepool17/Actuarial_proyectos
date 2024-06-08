@@ -20,7 +20,7 @@ body, html {
     font-family: 'Raleway', sans-serif;
     font-size: 32px;
     color: #132b60;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 .header-logo-right {
@@ -97,6 +97,9 @@ body, html {
     position: absolute;
     font-family: 'Roboto';
     width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .aviso_datos {
@@ -105,11 +108,15 @@ body, html {
     position: absolute;
     font-family: 'Roboto';
     width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-/*
 
-
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
+.center-image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}

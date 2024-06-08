@@ -119,6 +119,7 @@ celerybeat.pid
 
 # servidor de conección
 rsconnect-python/
+.ipynb
 # SageMath parsed files
 *.sage.py
 
