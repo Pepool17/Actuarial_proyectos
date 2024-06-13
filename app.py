@@ -7,6 +7,21 @@ from shinywidgets import render_widget
 import faicons as fa
 from pathlib import Path
 
+# Iconos
+ICONS = {
+    "money": fa.icon_svg("money-bill"),
+    "coins": fa.icon_svg("money-bill-trend-up"),
+    "sack-dollar": fa.icon_svg("sack-dollar")
+}
+
+# Banderas
+FLAGS = {
+    "Frances": "img/france.svg",
+    "Aleman": "img/germany.svg",
+    "Americano": "img/usa.svg"
+}
+
+# PAGINA WEB
 
 ui.include_css(
     Path(__file__).parent / "styles.css"
@@ -22,37 +37,27 @@ with ui.div(class_="header"):
         ui.h1("SISTEMAS DE AMORTIZACIÓN", class_="header-title")
     ui.img(src="https://cem.epn.edu.ec/imagenes/logos_institucionales/big_png/FACULTAD_CIENCIAS_big.png", alt="Ciencias", class_="header-logo-right")
 
-# Banderas
-FLAGS = {
-    "Frances": "img/france.svg",
-    "Aleman": "img/germany.svg",
-    "Americano": "img/usa.svg"
-}
-
+def read_svg(filename):
+    with open(filename, 'r') as f:
+        svg_content = f.read()
+    svg_content = svg_content.replace('<svg', '<svg class="center-image"')
+    return svg_content
+    
 # Barra de la izquierda
 with ui.sidebar(class_='bg-primary lead'):
-    ui.input_selectize("type", "Tipo de Amortización:", [f"Frances", "Aleman", "Americano"])
-    ui.input_selectize("frecuencia", "Frecuencia de pago:", ["Mensual","Trimestral","Semestral","Anual"])
+    @render.ui
+    def flag_svg():
+        tipo = input.type()
+        if tipo not in FLAGS:
+            tipo = 'Frances'
+        svg_content = read_svg(FLAGS[tipo])
+        return ui.HTML(svg_content)
+    ui.input_selectize("type", "Tipo de Amortización:", ["Frances", "Aleman", "Americano"])
+    ui.input_selectize("frecuencia", "Frecuencia de pago:", ["Mensual", "Trimestral", "Semestral", "Anual"])
     ui.input_numeric("K", "Monto solicitado en dólares:", None, min=0)
-    ui.input_numeric("n", "Numero de periodos (plazo):", None, min = 0, step=1)
-    ui.input_numeric("i", "Tasa anual efectiva (%):", None, min = 0)
-
-    @render.image
-    def show_flag():
-        selected_type = input.type()
-        if selected_type in FLAGS:
-            img : ImgData = {'src': FLAGS[selected_type], "width": "100px", 'class': 'center-image'}
-            return img
-        return None
-
-
-# Iconos
-ICONS = {
-    "money": fa.icon_svg("money-bill"),
-    "coins": fa.icon_svg("money-bill-trend-up"),
-    "sack-dollar": fa.icon_svg("sack-dollar")
-}
-
+    ui.input_numeric("n", "Numero de periodos (plazo):", None, min=0, step=1)
+    ui.input_numeric("i", "Tasa anual efectiva (%):", None, min=0)
+    
 # Función para calcular las cuotas de interés
 def calcular_cuotas_interes(i, frecuencia, n, K, tipo):
     tasa = tasa_interes(i, frecuencia)
