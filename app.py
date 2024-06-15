@@ -1,11 +1,12 @@
 import pandas
+from src.pdf_utils import create_pdf
 from src.sistemas_amortizacion import sistema_frances, sistema_aleman, sistema_americano, tasa_interes, sk
 from shiny.express import input, render, ui
-from shiny.types import ImgData
 import plotly.graph_objects as go
 from shinywidgets import render_widget
 import faicons as fa
 from pathlib import Path
+
 
 # Iconos
 ICONS = {
@@ -57,7 +58,36 @@ with ui.sidebar(class_='bg-primary lead'):
     ui.input_numeric("K", "Monto solicitado en dólares:", None, min=0)
     ui.input_numeric("n", "Numero de periodos (plazo):", None, min=0, step=1)
     ui.input_numeric("i", "Tasa anual efectiva (%):", None, min=0)
-    
+
+    # Contenedor para el botón de descarga
+    ui.div(id="download_button_container")
+
+    @render.ui
+    def show_download_button():
+        tipo = input.type()
+        frecuencia = input.frecuencia()
+        n = input.n()
+        K = input.K()
+        i = input.i()
+
+        datos_completos = all([
+            tipo is not None,
+            frecuencia is not None,
+            n is not None and n > 0,
+            K is not None and K > 0,
+            i is not None and i > 0
+        ])
+        
+        if datos_completos:
+            @render.download(label='Descargar', filename=lambda: f'Sistema {tipo}.pdf')
+            def download_pdf():
+                buffer = create_pdf(tipo, frecuencia, n, K, i)
+                yield buffer.read()
+
+            return ui.div(download_pdf, id='download-btn')
+        else:
+            return None
+
 # Función para calcular las cuotas de interés
 def calcular_cuotas_interes(i, frecuencia, n, K, tipo):
     tasa = tasa_interes(i, frecuencia)
@@ -131,6 +161,8 @@ with ui.card(full_screen=True,min_height= 200):
                     df = sistema_americano(tasa, n, K)
                 
                 df = df.reset_index()
+                df.iloc[-1,-1] = 0
+                
                 for col in df.columns:
                     if df[col].dtype in [int, float]:
                         df[col] = df[col].map(lambda x: f'{x:.2f}')
@@ -218,7 +250,7 @@ with ui.card():
                     yaxis_title='Valor (USD)',
                     template='plotly_white',
                     height=400,
-                    barmode='stack',  # Apilar las barras
+                    barmode='stack', 
                     margin = dict(t=100),
                     legend=dict(
                         orientation="h",
