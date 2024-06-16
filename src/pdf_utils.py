@@ -32,7 +32,7 @@ def create_pdf(tipo, frecuencia, n, K, i):
     pdf.text(x=18, y=80, txt=f'Tasa anual efectiva: {i}%')
 
     pdf.set_font('Times', 'B', 14)
-    pdf.text(x=18, y=95, txt='Tabla de Amortización para el Tipo Francés')
+    pdf.text(x=18, y=95, txt=f'Tabla de Amortización para el Tipo {tipo}')
 
     start_x = 18
     start_y = 100
